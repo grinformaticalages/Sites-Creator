@@ -1,58 +1,60 @@
-```
+```gitignore
 # Dependencies
 node_modules/
 
 # Build outputs
 dist/
 build/
-coverage/
-htmlcov/
-
-# Logs
-*.log
+*.js.map
+*.ts.map
 
 # Environment
 .env
 .env.local
-.env.*
+*.env.*
 
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Python
+# Logs
+*.log
+
+# Python (if applicable)
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
+env/
 venv/
 .venv/
-.env
+.ENV
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/modules/
+*.sublime-workspace
+.pytest_cache/
+.mypy_cache/
 
-# Compiled files
-*.class
-*.o
-*.obj
+# Compiled and binary files
 *.exe
 *.dll
 *.so
 *.a
+*.obj
 *.out
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Testing
-.mypy_cache/
-.pytest_cache/
-coverage.xml
-
-# Temporary files
-*.tmp
-*.swp
-*.swo
+*.o
 
 # Compressed files
 *.zip
@@ -73,8 +75,15 @@ coverage.xml
 *.Z
 *.lz
 *.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+htmlcov/
+.nyc_output/
+istanbul/
+.reports/
 ```
