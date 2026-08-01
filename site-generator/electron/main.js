@@ -27,7 +27,15 @@ function createWindow() {
     ? 'http://localhost:5173'
     : `file://${path.join(__dirname, '../dist/index.html')}`;
 
-  mainWindow.loadURL(startUrl);
+  // Tenta carregar a URL, se falhar tenta novamente após 1 segundo
+  const loadUrlWithRetry = () => {
+    mainWindow.loadURL(startUrl).catch((err) => {
+      console.log('Vite não está pronto ainda, tentando novamente em 1s...');
+      setTimeout(loadUrlWithRetry, 1000);
+    });
+  };
+
+  loadUrlWithRetry();
 
   if (isDev) {
     mainWindow.webContents.openDevTools();
