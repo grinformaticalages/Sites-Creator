@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './index.css'
 
 // Declaração para a API do Electron
@@ -18,21 +18,75 @@ interface SiteData {
   colors: {
     primary: string
     secondary: string
+    accent: string
+  }
+  fonts: {
+    heading: string
+    body: string
+  }
+  sections: string[]
+  features: {
+    seo: boolean
+    analytics: boolean
+    contactForm: boolean
+    newsletter: boolean
+    darkMode: boolean
+  }
+  businessInfo: {
+    email: string
+    phone: string
+    address: string
+    socialMedia: {
+      instagram: string
+      facebook: string
+      linkedin: string
+    }
   }
 }
 
 function App() {
   const [siteData, setSiteData] = useState<SiteData>({
-    name: 'Meu Site',
-    template: 'basic',
-    description: 'Um site incrível gerado automaticamente',
+    name: 'The Kings of Burguer',
+    template: 'landing-page',
+    description: 'O melhor hambúrguer artesanal da cidade',
     colors: {
-      primary: '#2563eb',
-      secondary: '#7c3aed'
+      primary: '#dc2626',
+      secondary: '#1e293b',
+      accent: '#f59e0b'
+    },
+    fonts: {
+      heading: 'Poppins',
+      body: 'Inter'
+    },
+    sections: ['hero', 'about', 'menu', 'testimonials', 'contact'],
+    features: {
+      seo: true,
+      analytics: false,
+      contactForm: true,
+      newsletter: true,
+      darkMode: false
+    },
+    businessInfo: {
+      email: 'contato@thekings.com.br',
+      phone: '(11) 99999-9999',
+      address: 'Rua dos Sabores, 123 - São Paulo, SP',
+      socialMedia: {
+        instagram: '@thekingsburguer',
+        facebook: 'thekingsburguer',
+        linkedin: ''
+      }
     }
   })
   const [exportStatus, setExportStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' })
   const [isExporting, setIsExporting] = useState(false)
+  const [activeTab, setActiveTab] = useState<'config' | 'preview'>('config')
+  const [previewIframe, setPreviewIframe] = useState('')
+
+  // Gera preview em tempo real
+  useEffect(() => {
+    const previewHtml = generatePreviewHtml(siteData)
+    setPreviewIframe(previewHtml)
+  }, [siteData])
 
   const handleExport = async () => {
     setIsExporting(true)
@@ -45,7 +99,7 @@ function App() {
         if (result.success) {
           setExportStatus({ 
             type: 'success', 
-            message: `✅ ${result.message}` 
+            message: `✅ Site exportado com sucesso! ${result.path}` 
           })
         } else {
           setExportStatus({ 
@@ -70,126 +124,116 @@ function App() {
   }
 
   const templates = [
-    { id: 'basic', name: 'Site Básico', description: 'Home, sobre, serviços e contato' },
-    { id: 'landing-page', name: 'Landing Page', description: 'Página única focada em conversão' },
-    { id: 'portfolio', name: 'Portfólio', description: 'Ideal para profissionais criativos' },
-    { id: 'ecommerce', name: 'E-commerce', description: 'Loja virtual com produtos' },
-    { id: 'blog', name: 'Blog', description: 'Site para artigos e conteúdo' }
+    { id: 'landing-page', name: 'Landing Page', description: 'Página única focada em conversão', icon: '🎯' },
+    { id: 'restaurant', name: 'Restaurante', description: 'Cardápio, reservas e delivery', icon: '🍔' },
+    { id: 'portfolio', name: 'Portfólio', description: 'Ideal para profissionais criativos', icon: '🎨' },
+    { id: 'ecommerce', name: 'E-commerce', description: 'Loja virtual completa', icon: '🛒' },
+    { id: 'corporate', name: 'Corporativo', description: 'Site institucional empresarial', icon: '🏢' },
+    { id: 'blog', name: 'Blog', description: 'Artigos e conteúdo', icon: '📝' }
   ]
+
+  const availableSections = {
+    'landing-page': ['hero', 'features', 'benefits', 'testimonials', 'cta', 'contact', 'faq'],
+    'restaurant': ['hero', 'about', 'menu', 'gallery', 'testimonials', 'location', 'reservation', 'contact'],
+    'portfolio': ['hero', 'about', 'skills', 'projects', 'testimonials', 'contact'],
+    'ecommerce': ['hero', 'featured-products', 'categories', 'benefits', 'testimonials', 'newsletter', 'contact'],
+    'corporate': ['hero', 'about', 'services', 'team', 'clients', 'testimonials', 'contact', 'careers'],
+    'blog': ['hero', 'featured-posts', 'categories', 'about', 'newsletter', 'contact']
+  }
 
   return (
     <div className="app">
       <header className="header">
-        <h1>🚀 Construtor de Sites</h1>
-        <p className="subtitle">Crie sites completos com estrutura profissional</p>
+        <div className="header-content">
+          <h1>🚀 Construtor de Sites Pro</h1>
+          <p className="subtitle">Crie sites profissionais completos e prontos para vender</p>
+        </div>
+        <div className="header-actions">
+          <button 
+            className={`tab-button ${activeTab === 'config' ? 'active' : ''}`}
+            onClick={() => setActiveTab('config')}
+          >
+            ⚙️ Configurar
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'preview' ? 'active' : ''}`}
+            onClick={() => setActiveTab('preview')}
+          >
+            👁️ Preview
+          </button>
+        </div>
       </header>
 
       <main className="main-content">
-        <section className="config-section">
-          <h2>1️⃣ Configurações</h2>
-          <div className="form-group">
-            <label>Nome do Site:</label>
-            <input
-              type="text"
-              value={siteData.name}
-              onChange={(e) => setSiteData({ ...siteData, name: e.target.value })}
-              placeholder="Ex: Minha Empresa"
-            />
-          </div>
-          <div className="form-group">
-            <label>Descrição:</label>
-            <textarea
-              value={siteData.description}
-              onChange={(e) => setSiteData({ ...siteData, description: e.target.value })}
-              rows={3}
-            />
-          </div>
-        </section>
-
-        <section className="config-section">
-          <h2>2️⃣ Template</h2>
-          <div className="templates-grid">
-            {templates.map((t) => (
-              <div
-                key={t.id}
-                className={`template-card ${siteData.template === t.id ? 'selected' : ''}`}
-                onClick={() => setSiteData({ ...siteData, template: t.id })}
-              >
-                <h3>{t.name}</h3>
-                <p>{t.description}</p>
-                {siteData.template === t.id && <div className="checkmark">✓</div>}
+        {activeTab === 'config' && (
+          <>
+            <section className="config-section">
+              <h2>1️⃣ Template</h2>
+              <div className="templates-grid">
+                {templates.map((t) => (
+                  <div
+                    key={t.id}
+                    className={`template-card ${siteData.template === t.id ? 'selected' : ''}`}
+                    onClick={() => {
+                      setSiteData({ 
+                        ...siteData, 
+                        template: t.id,
+                        sections: availableSections[t.id as keyof typeof availableSections]?.slice(0, 5) || []
+                      })
+                    }}
+                  >
+                    <div className="template-icon">{t.icon}</div>
+                    <h3>{t.name}</h3>
+                    <p>{t.description}</p>
+                    {siteData.template === t.id && <div className="checkmark">✓</div>}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
 
-        <section className="config-section">
-          <h2>3️⃣ Cores</h2>
-          <div className="colors-config">
-            <div className="color-picker">
-              <label>Primária:</label>
-              <input
-                type="color"
-                value={siteData.colors.primary}
-                onChange={(e) => setSiteData({ ...siteData, colors: { ...siteData.colors, primary: e.target.value } })}
-              />
-              <span>{siteData.colors.primary}</span>
-            </div>
-            <div className="color-picker">
-              <label>Secundária:</label>
-              <input
-                type="color"
-                value={siteData.colors.secondary}
-                onChange={(e) => setSiteData({ ...siteData, colors: { ...siteData.colors, secondary: e.target.value } })}
-              />
-              <span>{siteData.colors.secondary}</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="preview-section">
-          <h2>👁️ Estrutura Gerada</h2>
-          <div className="structure-preview">
-            <div className="file-tree">
-              <div className="folder">
-                <span>📁 {siteData.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}/</span>
-                <div className="files">
-                  <div className="file">📄 index.html</div>
-                  <div className="file">📁 css/style.css</div>
-                  <div className="file">📁 js/main.js</div>
-                  <div className="file">📁 images/</div>
-                  <div className="file">📖 README.md</div>
+            <section className="config-section">
+              <h2>2️⃣ Informações do Site</h2>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Nome do Site/Empresa:</label>
+                  <input
+                    type="text"
+                    value={siteData.name}
+                    onChange={(e) => setSiteData({ ...siteData, name: e.target.value })}
+                    placeholder="Ex: The Kings of Burguer"
+                  />
                 </div>
-              </div>
-            </div>
-            <div className="features-list">
-              <h3>Incluso:</h3>
-              <ul>
-                <li>✅ HTML5 responsivo</li>
-                <li>✅ CSS moderno</li>
-                <li>✅ JavaScript interativo</li>
-                <li>✅ Smooth scroll</li>
-                <li>✅ Formulário funcional</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section className="export-section">
-          <button className="export-button" onClick={handleExport} disabled={isExporting || !siteData.name.trim()}>
-            {isExporting ? '⏳ Exportando...' : '💾 Exportar Site Completo'}
-          </button>
-          {exportStatus.type && (
-            <div className={`status-message ${exportStatus.type}`}>{exportStatus.message}</div>
-          )}
-        </section>
-      </main>
-
-      <footer className="footer">
-        <p>Construtor de Sites v1.0 - Electron + React + TypeScript</p>
-      </footer>
-    </div>
-  )
-}
-
-export default App
+                <div className="form-group">
+                  <label>Descrição/Slogan:</label>
+                  <input
+                    type="text"
+                    value={siteData.description}
+                    onChange={(e) => setSiteData({ ...siteData, description: e.target.value })}
+                    placeholder="Ex: O melhor hambúrguer artesanal"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email:</label>
+                  <input
+                    type="email"
+                    value={siteData.businessInfo.email}
+                    onChange={(e) => setSiteData({ 
+                      ...siteData, 
+                      businessInfo: { ...siteData.businessInfo, email: e.target.value } 
+                    })}
+                    placeholder="contato@empresa.com"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Telefone:</label>
+                  <input
+                    type="tel"
+                    value={siteData.businessInfo.phone}
+                    onChange={(e) => setSiteData({ 
+                      ...siteData, 
+                      businessInfo: { ...siteData.businessInfo, phone: e.target.value } 
+                    })}
+                    placeholder="(00) 00000-0000"
+                  />
+                </div>
+                <div clas
