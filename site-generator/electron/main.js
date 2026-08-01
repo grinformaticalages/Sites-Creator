@@ -2,7 +2,6 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import isDev from 'electron-is-dev';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,23 +22,10 @@ function createWindow() {
     frame: true
   });
 
-  const startUrl = isDev
-    ? 'http://localhost:5173'
-    : `file://${path.join(__dirname, '../dist/index.html')}`;
-
-  // Tenta carregar a URL, se falhar tenta novamente após 1 segundo
-  const loadUrlWithRetry = () => {
-    mainWindow.loadURL(startUrl).catch((err) => {
-      console.log('Vite não está pronto ainda, tentando novamente em 1s...');
-      setTimeout(loadUrlWithRetry, 1000);
-    });
-  };
-
-  loadUrlWithRetry();
-
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
-  }
+  // Sempre usa build de produção (sem localhost)
+  const indexPath = `file://${path.join(__dirname, '../dist/index.html')}`;
+  console.log('Carregando:', indexPath);
+  mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
 
   mainWindow.on('closed', () => {
     mainWindow = null;
